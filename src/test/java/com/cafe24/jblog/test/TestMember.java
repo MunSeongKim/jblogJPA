@@ -1,13 +1,14 @@
-package com.cafe24.jblog.test.member;
+package com.cafe24.jblog.test;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -15,17 +16,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.cafe24.jblog.domain.Blog;
 import com.cafe24.jblog.domain.Member;
+import com.cafe24.jblog.dto.MemberDTO;
+import com.cafe24.jblog.repository.BlogRepository;
 import com.cafe24.jblog.service.MemberService;
-import com.cafe24.util.EncryptPassword;
 
 @ContextConfiguration( "classpath:applicationContext.xml" )
 @RunWith( SpringJUnit4ClassRunner.class )
 @FixMethodOrder( MethodSorters.NAME_ASCENDING )
-public class MemberTest {
+public class TestMember {
     @Autowired
     private MemberService memberService;
-
+    @Autowired
+    private BlogRepository blogRepository;
+    
     private Member member;
 
     @Before
@@ -33,26 +38,23 @@ public class MemberTest {
 	member = new Member();
 	member.setId( "dooly" );
 	member.setName( "둘리" );
-	member.setPassword( EncryptPassword.encrypt( "123" ) );
-	member.setRegDate( new Date() );
+	member.setPassword( "123" );
     }
 
     @Test
     public void Test01_join() {
-	assertTrue( memberService.join( member ) );
+	memberService.join( member );
+	assertNotNull(member.getId() );
+	List<Blog> blogs = blogRepository.findAll();
+	System.out.println( blogs );
     }
 
     @Test
     public void Test02_login() throws ParseException {
-	String result = memberService.login( "dooly", "123" );
+	MemberDTO result = memberService.login( "dooly", "123" );
+	System.out.println( result );
 	assertNotNull( result );
-	
-	String[] data = result.split(",");
-	Member m = new Member();
-	m.setId(data[0]);
-	m.setName(data[1]);
-	m.setRegDate(new SimpleDateFormat("yyyy-MM-dd").parse(data[2]));
-	
-	System.out.println( m );
+	assertThat( result, instanceOf( MemberDTO.class ) );
+	System.out.println( result );
     }
 }

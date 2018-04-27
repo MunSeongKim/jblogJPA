@@ -1,6 +1,5 @@
 package com.cafe24.jblog.domain;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -22,6 +21,7 @@ import lombok.ToString;
 public class Member {
 
     @Id
+    @Column(name="member_id")
     private String id;
     
     @Column(name="name", nullable=false, length=10)
@@ -33,9 +33,4 @@ public class Member {
     @Temporal(value=TemporalType.DATE)
     @Column(name="reg_date", nullable=false)
     private Date regDate;
-    
-    public String getRegDate(){
-	return new SimpleDateFormat("yyyy-MM-dd").format(this.regDate);
-    }
-
 }
